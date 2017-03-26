@@ -5,14 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-public enum eFileType
+public enum eFileType { MP3, FLAC, WEBM }
+public enum eWaterType { salt, sweet, brack }
+public enum eBirdSkills { canRun, canRunFly, canRunFlySwim }
+
+
+// T3.1: Implement an interface
+interface IAlbum  // an interface only contains the specification of its members, but no definitions!!
 {
-    MP3,
-    FLAC,
-    WEBM
+    string ArtistName { get; }
+    string AlbumTitle { get; }
+    int ReleaseYear { get; }
+    int NumOfTracks { get; }
+    eFileType FileType { get; }
+    int AlbumAge();
+    void updateNumOfTracks(int numOfTracks);
 }
 
-public class MusicCollection : Task3.IMusicCollection
+// T3.2 Change your existing class (from last week) so that it implements your newly defined interface.
+// Remark: Last week's implementation was: public class MusicCollection { ... }
+//         Changing to "public class MusicCollection : Task3.IMusicCollection" references to the interface (T3.1)
+public class Album : IAlbum
 {
     private string my_ArtistName;
     private string my_AlbumTitle;
@@ -22,7 +35,7 @@ public class MusicCollection : Task3.IMusicCollection
 
 
     // Das hier ist ein Konstruktor (muss genauso heissen wie die Klasse)!
-    public MusicCollection(string Artist, string Album, int Year, int NumTracks, eFileType FileType)
+    public Album(string Artist, string Album, int Year, int NumTracks, eFileType FileType)
     {
         if (Artist == null || Artist.Length == 0)
             throw new Exception("No artist name!");
@@ -42,110 +55,122 @@ public class MusicCollection : Task3.IMusicCollection
 
     public string ArtistName
     {
-        get { return my_ArtistName; }
-        set
-        {
-            if (ArtistName == null || ArtistName.Length == 0)
-                throw new Exception("No artist name!");
-
-            my_ArtistName = value;
-        }
+        get => my_ArtistName;
     }
 
     public string AlbumTitle
     {
-        get { return my_AlbumTitle; }
-        set
-        {
-            if (AlbumTitle == null || AlbumTitle.Length == 0)
-                throw new Exception("No album name!");
-
-            my_AlbumTitle = value;
-        }
+        get => my_AlbumTitle;
     }
 
     public int ReleaseYear
     {
-        get { return my_ReleaseYear; }
-        set
-        {
-            if (ReleaseYear < 1900 || ReleaseYear > DateTime.Today.Year)
-                throw new Exception("Invalid release year!");
-
-            my_ReleaseYear = value;
-        }
+        get => my_ReleaseYear;
     }
 
     public int NumOfTracks
     {
-        get { return my_NumOfTracks; }
-        set
-        {
-            if (NumOfTracks < 1 || NumOfTracks > 1000)
-                throw new Exception("Invalid number of tracks!");
-
-            my_NumOfTracks = value;
-        }
+        get => my_NumOfTracks;
     }
 
     public eFileType FileType
     {
-        get { return my_FileType; }
-        set { my_FileType = FileType; }
+        get => my_FileType;
     }
 
-    public int AlbumAge()
+    public int AlbumAge() => DateTime.Today.Year - this.ReleaseYear;
+    public void updateNumOfTracks(int numOfTracks)
     {
-        return DateTime.Today.Year - this.ReleaseYear;
+        if (numOfTracks < 1 || numOfTracks > 1000)
+            throw new Exception("Invalid number of tracks!");
+        else
+            my_NumOfTracks = numOfTracks;
     }
 }
 
 namespace Task3
 {
-    interface IMusicCollection
+    // T3.1: Implement another interface (vertebrate = Wirbeltiere)
+    public interface IVertebrate
     {
-        string ArtistName { get; set; }
-        string AlbumTitle { get; set; }
-        int ReleaseYear { get; set; }
-        int NumOfTracks { get; set; }
-        eFileType FileType { get; set; }
-        int AlbumAge();
+        int count { get; }
+        string family { get; }
+        string species { get; }
     }
 
-    public class MusicCollection2 : IMusicCollection
+    // T3.3: Add a class that implements the interface
+    // derive members of interface IAnimal
+    class Fish : IVertebrate
     {
-        private string my_ArtistName;
-        private string my_AlbumTitle;
-        private int my_ReleaseYear;
-        private int my_NumOfTracks;
-        private eFileType my_FileType;
+        static private int my_numOfFish;
+        private string my_speciesOfFish;
+        private eWaterType my_waterType;
+        private const string my_family = "Fish";
 
-        public MusicCollection2(string Artist, string Album, int Year, int NumTracks, eFileType FileType)
+        public Fish(string species, eWaterType water)  // constructor of class Fish
         {
-            if (Artist == null || Artist.Length == 0)
-                throw new Exception("No artist name!");
-            if (Album == null || Album.Length == 0)
-                throw new Exception("No album name!");
-            if (Year< 1900 || Year> 2017)
-                throw new Exception("Invalid release year!");
-            if (NumTracks< 1 || NumTracks> 1000)
-                throw new Exception("Invalid number of tracks!");
-
-            my_ArtistName = Artist;
-            my_AlbumTitle = Album;
-            my_ReleaseYear = Year;
-            my_NumOfTracks = NumTracks;
-            my_FileType = FileType;
+            if ((species.Trim()).Length == 0)
+                throw new Exception("Invalid fish species!");
+            else
+            {
+                my_speciesOfFish = species;
+                my_waterType = water;
+                my_numOfFish++;
+            }
         }
-        public string ArtistName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string AlbumTitle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int ReleaseYear { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int NumOfTracks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public eFileType FileType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public int AlbumAge()
+        public int count
         {
-            throw new NotImplementedException();
+            get => my_numOfFish;
+        }
+        public string family
+        {
+            get => my_family;
+        }
+        public string species
+        {
+            get => my_speciesOfFish;
+        }
+        public eWaterType water
+        {
+            get => my_waterType;
+        }
+    }
+
+    // T3.3: Add one more class that implements the interface
+    // derive members of interface IAnimal
+    class Bird : IVertebrate
+    {
+        static private int my_numOfBirds;
+        private string my_speciesOfBird;
+        private eBirdSkills my_skills;
+        private const string my_family = "Bird";
+
+        public Bird(string species, eBirdSkills skills)  // constructor of class Bird
+        {
+            if ((species.Trim()).Length == 0)
+                throw new Exception("Invalid bird species!");
+            else
+            {
+                my_speciesOfBird = species;
+                my_skills = skills;
+                my_numOfBirds++;
+            }
+        }
+        public int count
+        {
+            get => my_numOfBirds;
+        }
+        public string family
+        {
+            get => my_family;
+        }
+        public string species
+        {
+            get => my_speciesOfBird;
+        }
+        public eBirdSkills skills
+        {
+            get => my_skills;
         }
     }
 
@@ -155,25 +180,34 @@ namespace Task3
         {
             try
             {
-                MusicCollection a = new MusicCollection("Tristan Prettyman", "Hello...x", 2007, 14, eFileType.MP3);
-                MusicCollection b = new MusicCollection("Tommy Stinson", "One Man Mutiny", 2011, 10, eFileType.FLAC);
-                MusicCollection c = new MusicCollection("The Palms", "Untitled", 2013, 6, eFileType.WEBM);
-
-
-                a.ArtistName = "Xyz";
+                Album a = new Album("Tristan Prettyman", "Hello...x", 2007, 14, eFileType.MP3);
+                Album b = new Album("Tommy Stinson", "One Man Mutiny", 2011, 10, eFileType.FLAC);
+                Album c = new Album("The Palms", "Untitled", 2013, 6, eFileType.WEBM);
 
                 Console.WriteLine($"Album: {a.ArtistName}, {a.AlbumTitle}, {a.ReleaseYear}, {a.NumOfTracks}, {a.FileType}; age: {a.AlbumAge()} years");
                 Console.WriteLine($"Album: {b.ArtistName}, {b.AlbumTitle}, {b.ReleaseYear}, {b.NumOfTracks}, {b.FileType}; age: {b.AlbumAge()} years");
                 Console.WriteLine($"Album: {c.ArtistName}, {c.AlbumTitle}, {c.ReleaseYear}, {c.NumOfTracks}, {c.FileType}; age: {c.AlbumAge()} years");
 
-                var vMusicCollection = new IMusicCollection[] {
-                    new MusicCollection("Tristan Prettyman", "Hello...x", 2007, 14, eFileType.MP3),
-                    new MusicCollection2("Tommy Stinson", "One Man Mutiny", 2011, 10, eFileType.FLAC)
-                };
+                // T3.4: create array of interface type, loop over the array:
+                IVertebrate[] Vertebrate = new IVertebrate[8];
+
+                Vertebrate[0] = new Fish("Shark", eWaterType.salt);
+                Vertebrate[1] = new Fish("Clown Fish", eWaterType.salt);
+                Vertebrate[2] = new Fish("Scalare", eWaterType.sweet);
+                Vertebrate[3] = new Fish("Plated Catfish", eWaterType.sweet);
+                Vertebrate[4] = new Fish("Reedfish", eWaterType.brack);
+                Vertebrate[5] = new Bird("Sparrow", eBirdSkills.canRunFly);
+                Vertebrate[6] = new Bird("Ostrich", eBirdSkills.canRun);  // = Strauss
+                Vertebrate[7] = new Bird("Duck", eBirdSkills.canRunFlySwim);
+
+                for (int index = 0; index < Vertebrate.Length; index++)
+                {
+                    Console.WriteLine($"{Vertebrate[index].family}: {Vertebrate[index].species} ({Vertebrate[index].count})");
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Ups, something happened ({e.Message})");
+                Console.WriteLine($"Oops, something happened ({e.Message})");
             }
         }
     }
